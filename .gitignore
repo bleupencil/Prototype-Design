@@ -1,0 +1,12 @@
+# Exclude university working files
+Prototype Design/Assets/
+Prototype Design/Screenshots/
+Prototype Design/Working/
+
+# Exclude Illustrator source files
+*.ai
+
+# Exclude temporary files
+*.tmp
+.DS_Store
+Thumbs.db

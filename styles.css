@@ -1,0 +1,1325 @@
+/* ==========================================================================
+   Accessible Community Communication — prototype styles
+   --------------------------------------------------------------------------
+   Visual direction follows "Prototype Style Frames.ai": a cool grey page,
+   rounded white cards with a solid header band (blue on the overview, purple
+   on the chapter and assessment screens), orange headings and sub-headings,
+   a tile grid for the chapter schedule, and deep-purple rounded buttons.
+
+   Contrast ratios below were calculated with the WCAG 2.x relative-luminance
+   formula. They still need confirming with a contrast tool in context.
+
+   Text colours (need 4.5:1, or 3:1 for large text):
+     Charcoal  #263238 on page grey  #F2F4F7 ........ 11.9:1
+     Muted     #4A5560 on page grey ................. 6.9:1 (white 7.6:1)
+     Navy      #0B3D75 on white ..................... 10.8:1
+     Orange    #A85A00 on white ..................... 5.1:1 (page grey 4.6:1)
+     White on RCC blue #075092 (bands, tiles) ....... 8.2:1
+     White on course purple #6A5EB4 (bands) ......... 5.4:1
+     White on plum #443B73 (buttons) ................ 9.9:1
+     Plum on soft purple #E4E0F5 (closed accordions)  7.7:1
+     Tile number #DCE8F5 on blue .................... 6.6:1
+     Tile description #E8F0F9 on blue ............... 7.1:1
+     Navy on break tile #E3EBF5 ..................... 9.0:1
+     Purple-ink #5E52A6 on white .................... 6.5:1
+
+   Colour decisions:
+     - Course purple was darkened from #7064B5 to #6A5EB4 so that the white
+       bold text in the header bands passes 4.5:1 rather than relying on the
+       large-text exception.
+     - Orange #A85A00 is the lightest orange that still passes 4.5:1 on white,
+       so orange headings and the "Continue" link stay readable.
+     - Yellow is no longer used for backgrounds or decoration. It remains only
+       as the outer halo of the keyboard focus indicator, where it keeps the
+       focus ring visible on the dark blue and purple bands.
+     - Form-control borders use #6B7280 (4.8:1 on white) to meet the 3:1
+       non-text contrast requirement (WCAG 1.4.11).
+   ========================================================================== */
+
+:root {
+  --blue: #075092;
+  --navy: #0B3D75;
+  --purple: #6A5EB4;
+  --purple-ink: #5E52A6;
+  --plum: #443B73;
+  --lavender: #F0EDFA;
+  --soft-purple: #E4E0F5;
+  --soft-purple-hover: #D6D0EE;
+  --soft-blue: #E3EBF5;
+  --page: #F2F4F7;
+  --white: #FFFFFF;
+  --charcoal: #263238;
+  --muted: #4A5560;
+  --orange: #A85A00;
+  --orange-light: #F7B267;   /* decorative accents and text on charcoal only */
+  --tile-ink: #DCE8F5;
+  --tile-ink-soft: #E8F0F9;
+  --yellow: #FFDA27;         /* focus halo only */
+  --rule: #DDE1E8;           /* decorative divider only, not needed to identify anything */
+  --control-border: #6B7280;
+  --success: #1E6B3E;
+  --error: #B3261E;
+  --error-bg: #FDF1F0;
+
+  --font: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-card: 24px;
+  --measure: 40rem;          /* ~70 characters per line for comfortable reading */
+  --col: 58rem;              /* width of the card column, like the portrait frames */
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --card-pad: clamp(1.25rem, 4.5vw, 2.5rem);
+  --sticky-offset: 0px;      /* set by script.js to the sticky header height */
+
+  /* Screen accent: blue on the overview, purple on the chapter and assessment. */
+  --accent: var(--blue);
+  --accent-ink: var(--blue);
+  --band: var(--blue);
+  --band-soft: var(--soft-blue);
+  --soft-ink: var(--navy);
+}
+
+/* Chapter and assessment screens use the purple family. */
+[data-screen="chapter-5"],
+[data-screen="assessment"],
+[data-screen="resources"] {
+  --accent: var(--purple);
+  --accent-ink: var(--purple-ink);
+  --band: var(--purple);
+  --band-soft: var(--soft-purple);
+  --soft-ink: var(--plum);
+}
+
+/* ---------- Base ---------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  /* Percentage font size respects the user's browser text-size setting (WCAG 1.4.4). */
+  font-size: 100%;
+  /* Keeps focused/anchored elements clear of the sticky chapter header (WCAG 2.4.11). */
+  scroll-padding-top: calc(var(--sticky-offset) + 1rem);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 1.125rem;       /* 18px at default settings */
+  line-height: 1.6;
+  color: var(--charcoal);
+  background: var(--page);
+  /* No fixed heights on text containers so user text-spacing overrides work (WCAG 1.4.12). */
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.2;
+  color: var(--plum);
+  margin: 0 0 0.75rem;
+  font-weight: 700;
+  text-wrap: balance;
+}
+h1 { font-size: clamp(2.125rem, 1.4rem + 3.2vw, 3.5rem); letter-spacing: -0.02em; font-weight: 800; }
+h2 { font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem); letter-spacing: -0.01em; }
+h3 { font-size: 1.3rem; }
+h4 { font-size: 1.125rem; color: var(--charcoal); }
+
+p, ul, ol, dl, figure { margin: 0 0 1rem; }
+ul, ol { padding-left: 1.4rem; }
+li + li { margin-top: 0.35rem; }
+figure { margin-left: 0; margin-right: 0; }
+
+a {
+  color: var(--plum);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-thickness: 3px; }
+
+kbd {
+  font-family: inherit;
+  font-size: 0.9em;
+  padding: 0.05em 0.4em;
+  border: 1px solid var(--control-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--white);
+  white-space: nowrap;
+}
+
+abbr[title] { text-decoration: underline dotted; }
+
+/* ---------- Focus -----------------------------------------------------------
+   Two-tone indicator: a dark outline plus a yellow halo. Whichever background
+   it sits on, one of the two colours contrasts at 3:1 or more (WCAG 2.4.7 / 2.4.13).
+   :focus-visible avoids showing rings on mouse clicks while keeping them for keyboard. */
+:focus-visible {
+  outline: 3px solid var(--charcoal);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--yellow);
+  border-radius: 2px;
+}
+/* Headings and regions that receive focus programmatically don't need a ring. */
+[tabindex="-1"]:focus:not(:focus-visible) { outline: none; }
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus, main:focus { outline: none; box-shadow: none; }
+
+/* ---------- Utilities ------------------------------------------------------ */
+
+/* Hides content visually but keeps it available to screen readers. */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* The card column. Width is set directly so the same column lines up for the
+   header, the cards and the footer. */
+.wrap {
+  width: min(var(--col), calc(100% - 2 * var(--gutter)));
+  margin: 0 auto;
+}
+.measure { max-width: var(--measure); }
+
+.eyebrow {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 0.75rem;
+}
+.lead { font-size: 1.25rem; line-height: 1.5; }
+.note { font-size: 1rem; color: var(--muted); }
+.subhead { font-size: 1.1875rem; color: var(--orange); margin-top: 0.5rem; }
+
+/* ---------- Skip link, banner, header ------------------------------------- */
+
+.skip-link {
+  position: fixed;          /* visible at the top of the window even if the page is scrolled */
+  left: 1rem;
+  top: -100%;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--charcoal);
+  color: var(--white);
+  font-weight: 600;
+  border-radius: var(--radius);
+}
+.skip-link:focus { top: 1rem; }
+
+.site-header {
+  background: transparent;
+  border-bottom: 1px solid var(--rule);
+}
+.site-header__inner {
+  position: relative;       /* anchors the accessibility panel */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+}
+.site-header__brand { margin: 0; line-height: 1.3; }
+.site-header__org {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--blue);
+}
+.site-header__package { font-weight: 700; color: var(--navy); }
+
+.site-header__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-left: auto;          /* stays on the right when the header wraps */
+}
+
+.screen-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.screen-nav li + li { margin-top: 0; }
+.screen-nav a {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--plum);
+  min-height: 44px;         /* comfortable target, beyond the 24px minimum (WCAG 2.5.8) */
+  line-height: 1.75;
+}
+.screen-nav a:hover { background: var(--white); }
+/* Current page is shown with a filled pill AND an underline bar, not colour alone. */
+.screen-nav a[aria-current="page"] {
+  background: var(--white);
+  box-shadow: inset 0 -3px 0 var(--purple);
+}
+
+.noscript-note { padding: 1rem; background: var(--lavender); border-radius: var(--radius); }
+
+/* ---------- Screens ------------------------------------------------------- */
+
+/* With JS, only the active screen shows. Without JS, all screens show. */
+.js .screen { display: none; }
+.js .screen.is-active { display: block; }
+
+main { display: block; padding-bottom: 3rem; }
+main:focus { outline: none; }
+
+.section {
+  padding-top: clamp(2rem, 5vw, 3.5rem);
+}
+.section + .section { border-top: 1px solid var(--rule); margin-top: clamp(2rem, 5vw, 3.5rem); }
+
+.section-num {
+  display: inline-block;
+  margin-right: 0.5rem;
+  font-size: 0.75em;
+  font-weight: 600;
+  color: var(--tile-ink);     /* only appears inside the blue header bands */
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Buttons ------------------------------------------------------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.6rem 1.5rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.button--primary { background: var(--plum); color: var(--white); }
+.button--primary:hover { background: var(--purple-ink); }   /* white on #5E52A6 = 6.5:1 */
+.button--secondary { background: var(--white); color: var(--plum); border-color: var(--plum); }
+.button--secondary:hover { background: var(--lavender); }
+.button--quiet { background: transparent; color: var(--charcoal); border-color: var(--control-border); font-size: 1rem; }
+.button--quiet:hover { background: var(--white); }
+.button--large { font-size: 1.1875rem; padding: 0.8rem 1.75rem; }
+.button-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+/* ---------- Overview: welcome card ---------------------------------------- */
+
+.hero { padding: clamp(1.25rem, 3vw, 2rem) 0 0; }
+
+/* The hero's wrapper becomes one rounded white card. The small line above the
+   title becomes its blue header band. */
+.hero .wrap {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  padding-bottom: clamp(2rem, 5vw, 3rem);
+}
+.hero .wrap > :not(.eyebrow) {
+  margin-left: var(--card-pad);
+  margin-right: var(--card-pad);
+}
+.hero .eyebrow,
+.page-intro .eyebrow {
+  margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+  padding: 0.85rem var(--card-pad);
+  background: var(--band);
+  color: var(--white);               /* 8.2:1 on blue, 5.4:1 on purple */
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.hero h1 {
+  max-width: 12em;
+  margin-bottom: 1rem;
+  color: var(--navy);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+.hero__subtitle {
+  font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  font-weight: 700;
+  color: var(--orange);               /* 5.1:1 on white */
+  margin-bottom: 1.75rem;
+}
+.hero__action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 2rem;
+  margin-bottom: 0;
+}
+.hero__action-note { font-size: 1rem; color: var(--muted); max-width: 32rem; }
+
+/* ---------- Overview: section cards ---------------------------------------- */
+
+/* Each overview section is a white card with a solid blue header band. */
+[data-screen="overview"] .wrap > .section {
+  margin-top: 1.5rem;
+  padding: 0 var(--card-pad) clamp(1.5rem, 4vw, 2.25rem);
+  background: var(--white);
+  border-top: 0;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+[data-screen="overview"] .wrap > .section:first-child { padding-top: clamp(1.5rem, 4vw, 2.25rem); }
+[data-screen="overview"] .section > h2 {
+  margin: 0 calc(-1 * var(--card-pad)) 1.5rem;
+  padding: 0.85rem var(--card-pad);
+  background: var(--band);
+  color: var(--white);
+  font-size: 1.25rem;
+  letter-spacing: 0;
+}
+[data-screen="overview"] .section > h2.visually-hidden { margin: -1px; padding: 0; }
+
+.glance {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+  gap: 1.25rem 2rem;
+  margin: 0;
+}
+.glance div { border-top: 3px solid var(--accent); padding-top: 0.75rem; }
+.glance dt {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.glance dd { margin: 0.25rem 0 0; font-size: 1.0625rem; }
+
+.outcomes { padding-left: 1.5rem; }
+.outcomes li { padding-left: 0.25rem; margin-bottom: 0.75rem; }
+.outcomes li::marker { color: var(--accent-ink); font-weight: 700; }
+
+/* ---------- Overview: journey -------------------------------------------- */
+
+.journey { margin: 1.5rem 0 2rem; }
+.journey__track {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0;
+  padding: 1.25rem 0;
+}
+.journey__node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: var(--white);
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 1rem;
+}
+.journey__node.is-complete { background: var(--accent-ink); border-color: var(--accent-ink); color: var(--white); }
+.journey__node.is-complete::after { content: "✓"; font-size: 0.75rem; margin-left: 1px; }
+.journey__line {
+  flex: 1 1 0.75rem;
+  min-width: 0.75rem;
+  max-width: 3rem;
+  height: 2px;
+  background: var(--accent);
+}
+.journey__break {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.75rem;
+  border: 2px dashed var(--accent);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--navy);
+  background: var(--soft-blue);
+}
+.journey__caption { font-size: 1rem; color: var(--muted); max-width: var(--measure); }
+
+/* ---------- Overview: chapter tiles --------------------------------------- */
+
+/* The chapter list is a grid of solid blue tiles, like the "Progress schedule"
+   in the style frames. It is still an ordered list in the same order. */
+.chapters {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+  gap: 1rem;
+}
+.chapter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.1rem 1.25rem 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--blue);
+  color: var(--white);
+  margin: 0;
+}
+.chapter__num {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--tile-ink);               /* 6.6:1 on blue */
+  font-variant-numeric: tabular-nums;
+}
+.chapter__body { flex: 1 1 auto; min-width: 0; }
+.chapter__title { font-size: 1.25rem; line-height: 1.2; color: var(--white); margin: 0 0 0.4rem; }
+.chapter__title a { color: var(--white); }
+.chapter__desc { margin: 0; font-size: 1rem; line-height: 1.5; color: var(--tile-ink-soft); }
+.chapter__meta {
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--white);
+}
+.chapter__status:empty { display: none; }
+.chapter__status {
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 0.8125rem;
+  color: var(--success);               /* 6.5:1 on white */
+}
+/* The break is a lighter, dashed tile that spans the full row. */
+.chapter--break {
+  grid-column: 1 / -1;
+  background: var(--soft-blue);
+  color: var(--navy);
+  border: 2px dashed var(--blue);
+}
+.chapter--break .chapter__num,
+.chapter--break .chapter__title,
+.chapter--break .chapter__meta { color: var(--navy); }
+.chapter--break .chapter__desc { color: var(--muted); }
+/* Decorative marker; the words "Sample chapter" carry the meaning. */
+.chapter--sample { box-shadow: inset 0 -6px 0 var(--orange-light); }
+
+.two-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  gap: 1rem 3rem;
+}
+.ticks { padding-left: 1.25rem; }
+.ticks li::marker { color: var(--accent); }
+
+/* The closing "Start learning" link sits on the page, in orange with an arrow,
+   like "Continue" in the style frames. It is still a link with a 48px target. */
+.page-action { margin: 1.25rem 0 0; text-align: right; }
+.page-action .button--primary {
+  background: transparent;
+  color: var(--orange);               /* 4.6:1 on page grey */
+  padding-right: 0.25rem;
+  font-size: 1.25rem;
+}
+.page-action .button--primary::after {
+  content: "→";
+  color: var(--blue);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+.page-action .button--primary:hover { background: transparent; text-decoration: underline; text-decoration-thickness: 2px; }
+
+/* ---------- Chapter: sticky header --------------------------------------- */
+
+/* Layout: "Chapter 5 of 9" and the progress text on one line, the progress bar
+   beneath, then the purple title band. The wrappers use display: contents so
+   the existing markup can be arranged on one grid. */
+.chapter-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--page);
+}
+.chapter-bar__inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "num   count"
+    "track track"
+    "title title";
+  align-items: center;
+  gap: 0.3rem 1rem;
+  padding-top: 0.75rem;
+}
+.chapter-bar__titles, .progress { display: contents; }
+.chapter-bar__num {
+  grid-area: num;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+.progress__label {
+  grid-area: count;
+  justify-self: end;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.progress__track {
+  grid-area: track;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: #D5D9E0;
+  border: 1px solid var(--control-border);   /* track outline gives a 3:1 boundary */
+  overflow: hidden;
+}
+.progress__fill {
+  height: 100%;
+  width: 0;
+  background: var(--blue);
+  transition: width 0.4s ease;
+}
+.chapter-bar__title {
+  grid-area: title;
+  margin: 0.5rem 0 0;
+  padding: 0.9rem var(--card-pad);
+  background: var(--band);
+  color: var(--white);
+  font-size: clamp(1.25rem, 1.05rem + 0.9vw, 1.625rem);
+  font-weight: 700;
+  letter-spacing: 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+/* When the viewport is short (landscape phones, 200–400% zoom), a sticky header
+   would cover too much of the content, so it scrolls away normally instead. */
+@media (max-height: 34rem), (max-width: 30rem) {
+  .chapter-bar { position: static; }
+}
+
+/* The chapter body is one white card attached beneath the title band. */
+.chapter-content {
+  background: var(--white);
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+  padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
+}
+.chapter-content > * {
+  margin-left: var(--card-pad);
+  margin-right: var(--card-pad);
+}
+[data-screen="chapter-5"] .section > h2,
+[data-screen="resources"] .section > h2,
+[data-screen="assessment"] .task-step__title { color: var(--orange); }   /* 5.1:1 on white */
+[data-screen="chapter-5"] .section > h2,
+[data-screen="resources"] .section > h2 { font-weight: 800; }
+
+/* Resources: the same purple title band, without progress or stickiness. */
+.chapter-bar--page { position: static; }
+.chapter-bar--page .chapter-bar__inner { display: block; }
+.chapter-bar--page .chapter-bar__title { margin-top: 0; }
+
+/* ---------- Breadcrumbs ---------------------------------------------------- */
+
+.breadcrumb { padding-top: 1rem; font-size: 0.9375rem; }
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.breadcrumb li { display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+.breadcrumb li + li { margin-top: 0; }
+/* The separator is decoration; the list structure already tells screen readers the order. */
+.breadcrumb li + li::before { content: "/"; color: var(--muted); }
+.breadcrumb a, .breadcrumb [aria-current="page"] { display: inline-block; padding: 0.4rem 0; }
+.breadcrumb a { color: var(--plum); font-weight: 600; }
+.breadcrumb [aria-current="page"] { color: var(--charcoal); font-weight: 700; }
+
+/* Assessment progress: same layout as the chapter bar, but not sticky. */
+.progress-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.3rem 1rem;
+  padding-top: 0.25rem;
+}
+.progress-row p { margin: 0; font-size: 0.875rem; font-weight: 600; }
+.progress-row__value { justify-self: end; }
+.progress-row .progress__track { grid-area: auto; grid-column: 1 / -1; }
+
+.page-action--inline { text-align: left; margin-top: 1.5rem; }
+
+/* ---------- Chapter: comparison ------------------------------------------ */
+
+.compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+.compare__item {
+  margin: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.compare__caption {
+  padding: 0.875rem 1.25rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--rule);
+  background: var(--page);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+.tag {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tag--before { background: var(--charcoal); color: var(--white); }
+.tag--after { background: var(--plum); color: var(--white); }
+
+.doc-sample { padding: 1.25rem; flex: 1; }
+.doc-sample__line { margin: 0 0 0.6rem; font-size: 1rem; }
+.doc-sample__line--h1 { font-size: 1.3rem; font-weight: 700; line-height: 1.25; }
+.doc-sample__line--h2 { font-weight: 700; margin-top: 1rem; }
+.compare__item--after .doc-sample__line--h1,
+.compare__item--after .doc-sample__line--h2 { color: var(--plum); }
+.style-label {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--muted);
+  letter-spacing: 0;
+}
+
+.outline {
+  padding: 1rem 1.25rem;
+  background: var(--lavender);
+  border-top: 1px solid var(--rule);
+  font-size: 1rem;
+}
+.outline__title {
+  margin: 0 0 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--plum);
+}
+.outline__empty { margin: 0; color: var(--charcoal); font-style: italic; }
+.outline__tree { margin: 0; padding-left: 1.1rem; }
+.outline__tree ul { padding-left: 1.25rem; margin-top: 0.25rem; }
+
+/* ---------- Chapter: video placeholder ----------------------------------- */
+
+/* A grey video-shaped panel, as in the style frames, but still an honest,
+   labelled placeholder with no fake player controls. */
+.video-placeholder {
+  max-width: 48rem;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  margin-bottom: 1.5rem;
+  border: 2px dashed var(--control-border);
+  border-radius: var(--radius-lg);
+  background: var(--page);
+}
+/* aspect-ratio is a minimum, so text is never cut off when enlarged. */
+@supports (aspect-ratio: 1) { .video-placeholder { height: auto; min-height: 0; } }
+.video-placeholder p { margin: 0 0 0.75rem; max-width: 36rem; }
+.video-placeholder__label {
+  align-self: flex-start;
+  padding: 0.15rem 0.6rem;
+  border-radius: 4px;
+  background: var(--charcoal);
+  color: var(--white);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------- Accordions (disclosure pattern) ------------------------------ */
+
+/* Each accordion is a rounded bar, like "What will you learn?" in the frames:
+   soft fill when closed, solid purple with white text when open. The arrow
+   sits on the left and points down when closed and up when open. */
+.accordion-group {
+  max-width: 48rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.accordion {
+  border: 2px solid var(--band);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--white);
+}
+.accordion__heading { margin: 0; font-size: 1.125rem; }
+.accordion__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.9rem;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.875rem 1.1rem;
+  border: 0;
+  background: var(--band-soft);
+  font: inherit;
+  font-weight: 700;
+  color: var(--soft-ink);            /* plum on soft purple 7.7:1 */
+  text-align: left;
+  cursor: pointer;
+}
+.accordion__trigger:hover { background: var(--soft-purple-hover); }
+.accordion__trigger[aria-expanded="true"],
+.accordion__trigger[aria-expanded="true"]:hover { background: var(--band); color: var(--white); }
+/* Chevron drawn with borders so it inherits colour and works in forced-colours mode. */
+.accordion__trigger::after {
+  content: "";
+  order: -1;
+  flex: 0 0 auto;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-left: 0.2rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-0.15rem);
+  transition: transform 0.2s ease;
+}
+.accordion__trigger[aria-expanded="true"]::after { transform: rotate(-135deg) translateY(-0.1rem); }
+.accordion__panel { padding: 1rem 1.25rem 1.25rem; }
+.accordion__panel h4 { margin-top: 1rem; }
+.accordion__panel h4:first-child { margin-top: 0.25rem; }
+.transcript p { font-size: 1rem; }
+
+.steps { padding-left: 1.4rem; }
+.steps li { padding-left: 0.25rem; }
+
+/* ---------- Chapter: practice -------------------------------------------- */
+
+.practice {
+  border-left: 4px solid var(--accent);
+  padding-left: clamp(1rem, 3vw, 2rem);
+}
+
+fieldset { min-width: 0; }   /* default min-content width would push narrow screens sideways */
+
+.checklist, .explain {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--page);
+  padding: 1.25rem 1.5rem 1rem;
+  margin: 1.5rem 0;
+  max-width: 48rem;
+}
+legend {
+  padding: 0 0.4rem;
+  margin-left: -0.4rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--plum);
+}
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+}
+.check input {
+  flex: 0 0 auto;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin: 0.15rem 0 0;
+  accent-color: var(--plum);
+  cursor: pointer;
+}
+.check label { cursor: pointer; }
+
+
+.status-msg { font-weight: 600; min-height: 0; }
+.status-msg:empty { margin: 0; }
+.status-msg.is-success { color: var(--success); }
+.status-msg.is-info { color: var(--plum); }
+
+/* ---------- Chapter: previous/next --------------------------------------- */
+
+.chapter-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--rule);
+}
+.chapter-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--plum);
+  border-radius: var(--radius);
+  background: var(--white);
+  font: inherit;
+  text-align: left;
+  color: var(--plum);
+  cursor: pointer;
+}
+.chapter-nav__link:hover { background: var(--lavender); }
+.chapter-nav__link--next { text-align: right; align-items: flex-end; }
+.chapter-nav__dir { font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.chapter-nav__link--prev .chapter-nav__dir::before { content: "← "; }
+.chapter-nav__link--next .chapter-nav__dir::after { content: " →"; }
+.chapter-nav__name { font-weight: 600; color: var(--charcoal); }
+
+/* ---------- Assessment ---------------------------------------------------- */
+
+/* The introduction is a white card with a purple header band (the small line
+   above the title), matching the chapter screens. */
+.page-intro {
+  margin-top: 0.75rem;
+  padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  background: var(--white);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.page-intro > :not(.eyebrow) {
+  margin-left: var(--card-pad);
+  margin-right: var(--card-pad);
+}
+.page-intro h1 { max-width: 20ch; color: var(--navy); line-height: 1.1; letter-spacing: -0.03em; }
+
+.domains {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+  gap: 1rem 2rem;
+  max-width: 56rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+.domains div { border-top: 3px solid var(--accent); padding-top: 0.75rem; }
+.domains dt { font-weight: 700; color: var(--plum); font-size: 1.125rem; }
+.domains dd { margin: 0.25rem 0 0; color: var(--muted); }
+.domain-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: 0.35rem;
+  border-radius: 50%;
+  background: var(--plum);
+  color: var(--white);
+  font-size: 0.875rem;
+}
+
+/* Each task step is its own white card. */
+.task-steps { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 1.5rem; }
+.task-step {
+  padding: clamp(1.5rem, 4vw, 2.25rem) var(--card-pad);
+  background: var(--white);
+  border-radius: var(--radius-card);
+  margin: 0;
+}
+.task-step__title { display: flex; align-items: baseline; gap: 0.75rem; font-weight: 800; }
+.task-step__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  color: var(--plum);
+  font-size: 1.125rem;
+  transform: translateY(-0.1rem);
+}
+
+.notice-extract {
+  max-width: 44rem;
+  margin-top: 1.5rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--white);
+}
+.notice-extract figcaption {
+  padding: 0.6rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+  background: var(--page);
+}
+.notice-extract__doc {
+  padding: 1.25rem;
+  font-family: "Times New Roman", Times, serif;  /* deliberately "unedited" look */
+  font-size: 1.0625rem;
+}
+.notice-extract__doc p:last-child { margin-bottom: 0; }
+
+.mock-notice {
+  max-width: 48rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border-left: 6px solid var(--charcoal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--lavender);
+}
+.mock-notice p { margin: 0; }
+
+.field { margin: 1rem 0; }
+.field label, .field--file label { display: block; font-weight: 700; margin-bottom: 0.35rem; }
+.label-hint { font-weight: 400; color: var(--muted); }
+textarea, input[type="file"] {
+  display: block;
+  width: 100%;
+  max-width: 44rem;
+  font: inherit;
+  font-size: 1.0625rem;
+  color: var(--charcoal);
+  background: var(--white);
+  border: 2px solid var(--control-border);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+}
+textarea { resize: vertical; min-height: 6rem; }
+input[type="file"] { padding: 0.5rem; cursor: pointer; }
+.field--file { max-width: 48rem; margin: 1.5rem 0; }
+
+/* Errors: red border AND a text message AND an icon, never colour alone. */
+[aria-invalid="true"] { border-color: var(--error); box-shadow: inset 4px 0 0 var(--error); }
+fieldset[aria-invalid="true"] { border-color: var(--error); border-width: 2px; box-shadow: none; }
+.field-error {
+  margin: 0.25rem 0 0.5rem;
+  color: var(--error);
+  font-weight: 700;
+  font-size: 1rem;
+}
+.field-error::before { content: "⚠ "; }
+
+.error-summary {
+  max-width: 48rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 3px solid var(--error);
+  border-radius: var(--radius);
+  background: var(--error-bg);
+}
+.error-summary h3 { color: var(--error); }
+.error-summary ul { margin: 0; }
+.error-summary a { color: var(--error); font-weight: 600; }
+
+.confirmation {
+  max-width: 48rem;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  border: 2px solid var(--success);
+  border-left-width: 8px;
+  border-radius: var(--radius);
+  background: var(--white);
+}
+.confirmation h3 { color: var(--success); }
+
+/* ---------- Footer -------------------------------------------------------- */
+
+/* Small and quiet: one centred line of legal text, with the reviewer notes
+   collapsed behind a plain text control. Muted text is 6.9:1 on the page grey. */
+.site-footer {
+  margin-top: 2rem;
+  padding: 1.25rem 0 2rem;
+  background: transparent;
+  border-top: 1px solid var(--rule);
+  font-size: 0.875rem;
+  text-align: center;
+}
+.site-footer__legal { color: var(--muted); font-size: 0.875rem; line-height: 1.5; max-width: 48rem; margin: 0 auto; }
+.footer-notes { max-width: 48rem; margin: 0.75rem auto 0; text-align: left; }
+.footer-notes summary {
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 0.4rem 0.25rem;
+  color: var(--plum);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+.footer-notes[open] summary { margin-bottom: 0.75rem; }
+.site-footer h2 { font-size: 1rem; color: var(--navy); letter-spacing: 0; }
+.footer-block { max-width: 48rem; margin-bottom: 1.25rem; }
+.footer-block ul { font-size: 0.9375rem; }
+
+/* ---------- Responsive ---------------------------------------------------- */
+
+@media (max-width: 40rem) {
+  .chapter-nav__link--next { text-align: left; align-items: flex-start; }
+  .journey__node { width: 2.25rem; height: 2.25rem; }
+  .checklist, .explain { padding: 1rem; }
+  .chapters { grid-template-columns: 1fr; }
+  .page-action { text-align: left; }
+}
+
+/* ---------- Motion ---------------------------------------------------------
+   Respect users who ask the OS to reduce motion (WCAG 2.3.3 good practice). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* ---------- Accessibility menu -------------------------------------------- */
+
+/* Needs JavaScript, so it stays hidden without it. */
+.a11y { display: none; }
+.js .a11y { display: block; }
+
+.a11y__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.35rem 1rem 0.35rem 0.8rem;
+  border: 2px solid var(--plum);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--plum);
+  font: inherit;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.a11y__toggle:hover { background: var(--white); }
+.a11y__toggle[aria-expanded="true"] { background: var(--plum); color: var(--white); }
+.a11y__icon { width: 1.5rem; height: 1.5rem; flex: 0 0 auto; color: var(--navy); }
+.a11y__toggle[aria-expanded="true"] .a11y__icon { color: var(--white); }
+
+.a11y__panel {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  z-index: 60;
+  width: min(26rem, 100%);
+  max-height: calc(100vh - 9rem);
+  overflow: auto;
+  padding: 1.1rem 1.25rem 0.75rem;
+  background: var(--white);
+  border: 2px solid var(--plum);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 28px rgba(38, 50, 56, 0.2);
+}
+.a11y__group { margin: 0 0 1rem; }
+.a11y__label { margin: 0 0 0.4rem; font-weight: 700; color: var(--plum); font-size: 1rem; }
+.a11y__row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.a11y__row .button { flex: 1 1 auto; }
+.a11y__stack { display: grid; gap: 0.5rem; }
+.a11y__stack .button { justify-content: space-between; }
+.a11y .button { min-height: 44px; padding: 0.4rem 1rem; font-size: 1rem; }
+.a11y__state { font-weight: 700; }
+
+/* Toggles: filled when on or open. The words On/Off (or the open Help panel)
+   carry the state as well, so colour is never the only signal. */
+.button--toggle[aria-pressed="true"],
+.button--toggle[aria-expanded="true"] { background: var(--plum); color: var(--white); border-color: var(--plum); }
+.button--toggle[aria-pressed="true"]:hover,
+.button--toggle[aria-expanded="true"]:hover { background: var(--purple-ink); }
+/* At a limit: still focusable (aria-disabled) but visibly unavailable. */
+.button[aria-disabled="true"] {
+  background: var(--page);
+  color: var(--muted);
+  border-color: var(--control-border);
+  cursor: not-allowed;
+}
+
+.a11y__help { margin: 0 0 1rem; padding: 0.75rem 0 0; border-top: 1px solid var(--rule); font-size: 0.9375rem; }
+.a11y__help ul { margin: 0; padding-left: 1.2rem; }
+.a11y__help li + li { margin-top: 0.6rem; }
+.a11y__status { margin: 0; min-height: 1.5rem; font-size: 0.9375rem; }
+
+@media (max-width: 40rem) {
+  .a11y__panel { left: 0; right: 0; width: auto; }
+}
+
+/* ---------- Page mask ------------------------------------------------------ */
+
+/* The shadow darkens everything outside the band. pointer-events: none keeps
+   clicks, touches and focus working underneath. The menu panel (z-index 60)
+   stays above it so the controls remain readable. */
+.page-mask { position: fixed; inset: 0; z-index: 40; overflow: hidden; pointer-events: none; }
+.page-mask[hidden] { display: none; }
+.page-mask__window {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 40%;
+  height: 6rem;
+  box-shadow: 0 0 0 200vmax rgba(15, 23, 42, 0.72);
+}
+
+/* ---------- Text mode -----------------------------------------------------
+   A plain reading layout. Headings, instructions and all content stay; cards,
+   coloured bands, tiles and decorative graphics are removed, and spacing is
+   increased. Buttons keep their normal look and states. */
+.text-mode { --card-pad: 0rem; --col: 42rem; }
+.text-mode body { background: var(--white); color: #111; line-height: 1.8; }
+.text-mode .hero .wrap,
+.text-mode [data-screen="overview"] .wrap > .section,
+.text-mode .chapter-content,
+.text-mode .page-intro,
+.text-mode .task-step {
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+}
+.text-mode [data-screen="overview"] .wrap > .section { padding-left: 0; padding-right: 0; border-top: 1px solid var(--rule); border-radius: 0; margin-top: 1rem; }
+.text-mode .task-step { padding-left: 0; padding-right: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+.text-mode .hero .eyebrow,
+.text-mode .page-intro .eyebrow {
+  background: none;
+  color: #111;
+  padding: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.text-mode [data-screen="overview"] .section > h2 {
+  margin: 0 0 1rem;
+  padding: 0;
+  background: none;
+  color: #111;
+}
+.text-mode .section-num { color: #111; }
+.text-mode .chapter-bar { position: static; background: transparent; }
+.text-mode .chapter-bar__title {
+  padding: 0 0 0.5rem;
+  background: none;
+  color: #111;
+  border-radius: 0;
+  border-bottom: 2px solid #111;
+}
+.text-mode h1, .text-mode h2, .text-mode h3, .text-mode h4,
+.text-mode .subhead, .text-mode .hero__subtitle,
+.text-mode [data-screen] .section > h2, .text-mode .task-step__title,
+.text-mode .page-intro h1, .text-mode .hero h1 { color: #111; }
+.text-mode a:not(.button) { color: #0B3D75; }
+.text-mode .chapters { grid-template-columns: 1fr; }
+.text-mode .chapter, .text-mode .chapter--break {
+  background: transparent;
+  color: #111;
+  border: 1px solid #111;
+  border-radius: 0;
+  box-shadow: none;
+}
+.text-mode .chapter__num, .text-mode .chapter__title, .text-mode .chapter__title a,
+.text-mode .chapter__desc, .text-mode .chapter__meta { color: #111; }
+.text-mode .chapter__status { background: transparent; color: #111; border: 1px solid #111; }
+.text-mode .journey__track,
+.text-mode .progress__track { display: none; }
+.text-mode .compare__item, .text-mode .checklist, .text-mode .explain,
+.text-mode .video-placeholder, .text-mode .notice-extract, .text-mode .accordion {
+  border-radius: 0;
+}
+.text-mode .accordion__trigger { border-radius: 0; }
+.text-mode .page-action { text-align: left; }
+
+/* Larger text: a sticky header would cover too much of the screen. */
+html[data-text-scale="150"] .chapter-bar,
+html[data-text-scale="175"] .chapter-bar,
+html[data-text-scale="200"] .chapter-bar { position: static; }
+
+/* ---------- Windows High Contrast / forced colours ------------------------ */
+@media (forced-colors: active) {
+  .progress__fill { background: Highlight; forced-color-adjust: none; }
+  .journey__node.is-complete { border: 3px solid Highlight; }
+  .journey__line { background: CanvasText; }
+  .button, .chapter-nav__link, .chapter, .accordion, .a11y__toggle, .a11y__panel { border: 2px solid ButtonText; }
+  .page-mask__window { box-shadow: none; border-block: 3px solid CanvasText; }
+  :focus-visible { outline: 3px solid Highlight; }
+}
+
+/* ---------- Print ----------------------------------------------------------
+   Prints the screen that is showing (hidden screens stay hidden). Navigation,
+   the accessibility menu, the mask, buttons and prototype notes are removed.
+   Colour bands become plain headings so white text never prints on white. */
+@media print {
+  :root { --card-pad: 0rem; --col: 100%; }
+  html { font-size: 100% !important; }
+  body { background: #fff; color: #000; font-size: 12pt; }
+  .skip-link, .site-header, .breadcrumb, .a11y, .page-mask,
+  .chapter-nav, .page-action, .hero__action, .button, .status-msg,
+  .section--complete, .footer-notes, .journey__track, .progress__track { display: none !important; }
+  .wrap { width: 100%; }
+  .hero .wrap, [data-screen="overview"] .wrap > .section, .chapter-content, .page-intro, .task-step {
+    background: none; border-radius: 0; overflow: visible; box-shadow: none; padding-left: 0; padding-right: 0;
+  }
+  .hero .eyebrow, .page-intro .eyebrow, .chapter-bar__title,
+  [data-screen="overview"] .section > h2 {
+    background: none !important; color: #000 !important; padding: 0 0 0.25rem; margin: 0 0 0.75rem;
+    border-bottom: 2px solid #000; border-radius: 0; letter-spacing: 0;
+  }
+  .chapter-bar { position: static; background: none; }
+  .section-num { color: #000; }
+  h1, h2, h3, h4, .subhead, .hero__subtitle, .task-step__title,
+  [data-screen] .section > h2 { color: #000 !important; }
+  .chapter { background: #fff; color: #000; border: 1px solid #000; box-shadow: none; break-inside: avoid; }
+  .chapter__num, .chapter__title, .chapter__title a, .chapter__desc, .chapter__meta { color: #000; }
+  .chapters { grid-template-columns: 1fr 1fr; }
+  .chapter--break { grid-column: 1 / -1; background: #fff; }
+  .accordion { border-color: #000; break-inside: avoid; }
+  .accordion__trigger { background: none !important; color: #000 !important; }
+  .accordion__trigger::after { display: none; }
+  .accordion__panel[hidden] { display: block !important; }
+  .compare__item, .notice-extract, .mock-notice { break-inside: avoid; }
+  .site-footer { border-top: 1px solid #000; }
+  .site-footer__legal { color: #000; }
+}

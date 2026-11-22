@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<!--
+  Accessible Community Communication — learning package prototype
+  ------------------------------------------------------------------
+  A single HTML file holds three prototype "screens". script.js shows one
+  screen at a time using hash routes (#/overview, #/chapter-5, #/assessment)
+  so that the browser Back button works and the prototype runs from file://.
+
+  Accessibility notes (see also README.md):
+  - lang="en-AU" so screen readers use Australian English pronunciation.
+  - Each screen has exactly one <h1>; headings below it do not skip levels.
+  - Landmarks: header, nav, main, footer. A skip link is the first focusable item.
+  - If JavaScript fails, every screen and every accordion panel stays visible
+    (progressive enhancement), so no content is lost.
+-->
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <!-- No maximum-scale / user-scalable=no: users must be able to pinch-zoom (WCAG 1.4.4). -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Overview – Accessible Community Communication (prototype)</title>
+  <meta name="description" content="Prototype of a short learning package on accessible community communication for staff and volunteers.">
+  <!-- Adds a 'js' class before first paint so hidden screens don't flash. -->
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <!-- Skip link: first tab stop, visible on focus (WCAG 2.4.1). -->
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <p class="site-header__brand">
+        <span class="site-header__org">Redland Community Centre</span>
+        <span class="site-header__package">Accessible Community Communication</span>
+      </p>
+      <div class="site-header__tools">
+        <!-- Prototype screen navigation. aria-current marks the visible screen. -->
+        <nav class="screen-nav" aria-label="Prototype screens">
+          <ul role="list">
+            <li><a href="#/overview" data-route-link="overview">Overview</a></li>
+            <li><a href="#/chapter-5" data-route-link="chapter-5">Chapter 5</a></li>
+            <li><a href="#/assessment" data-route-link="assessment">Assessment</a></li>
+            <li><a href="#/resources" data-route-link="resources">Resources</a></li>
+          </ul>
+        </nav>
+
+        <!--
+          Accessibility menu: a disclosure button that shows a panel of real controls.
+          It only appears when JavaScript is running (CSS hides it otherwise), because
+          every control in it needs script. Focus stays on the button when the panel
+          opens; Tab moves into the panel; Escape closes it and returns focus to the button.
+        -->
+        <div class="a11y" data-a11y>
+          <button type="button" class="a11y__toggle" id="a11y-toggle" aria-expanded="false" aria-controls="a11y-panel" data-a11y-toggle>
+            <svg class="a11y__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="3.8" r="2.4" fill="currentColor"/><path d="M3.5 8.6h17M12 8.6v5.4m0 0-3.4 7.6m3.4-7.6 3.4 7.6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Accessibility</span>
+          </button>
+
+          <div class="a11y__panel" id="a11y-panel" role="group" aria-label="Accessibility options" hidden data-a11y-panel>
+
+            <div class="a11y__group" role="group" aria-labelledby="a11y-size-label">
+              <p class="a11y__label" id="a11y-size-label">Text size: <span data-a11y-size-value>100%</span></p>
+              <div class="a11y__row">
+                <button type="button" class="button button--secondary" data-a11y-smaller>Smaller text</button>
+                <button type="button" class="button button--secondary" data-a11y-larger>Larger text</button>
+                <button type="button" class="button button--secondary" data-a11y-reset-size>Reset text size</button>
+              </div>
+            </div>
+
+            <div class="a11y__group a11y__stack">
+              <button type="button" class="button button--secondary button--toggle" aria-pressed="false" data-a11y-textmode>
+                <span>Text mode</span> <span class="a11y__state" aria-hidden="true" data-a11y-state>Off</span>
+              </button>
+              <button type="button" class="button button--secondary button--toggle" aria-pressed="false" data-a11y-mask>
+                <span>Page mask</span> <span class="a11y__state" aria-hidden="true" data-a11y-state>Off</span>
+              </button>
+              <button type="button" class="button button--secondary" data-a11y-print>Print or save as PDF</button>
+              <button type="button" class="button button--secondary button--toggle" aria-expanded="false" aria-controls="a11y-help" data-a11y-help-toggle>Help</button>
+            </div>
+
+            <div class="a11y__help" id="a11y-help" hidden>
+              <ul>
+                <li><strong>Text size:</strong> Smaller text, Larger text and Reset text size change the text size in this prototype only. To zoom the whole page, use your browser: <kbd>Ctrl</kbd> + <kbd>+</kbd> or <kbd>-</kbd> (<kbd>Cmd</kbd> on a Mac), and <kbd>Ctrl</kbd> + <kbd>0</kbd> to reset. You can also change the text size in your device settings.</li>
+                <li><strong>Text mode:</strong> shows the same headings, instructions and content in a plain reading layout.</li>
+                <li><strong>Page mask:</strong> dims the page except for a reading band that follows your mouse pointer, your finger or your keyboard focus.</li>
+                <li><strong>Print or save as PDF:</strong> opens your browser’s print dialogue. Choose “Save as PDF” as the destination to keep a copy. Shortcut: <kbd>Ctrl</kbd> + <kbd>P</kbd> (<kbd>Cmd</kbd> + <kbd>P</kbd> on a Mac).</li>
+                <li><strong>Keyboard:</strong> <kbd>Tab</kbd> and <kbd>Shift</kbd> + <kbd>Tab</kbd> move between controls. <kbd>Enter</kbd> or <kbd>Space</kbd> activates a button. <kbd>Esc</kbd> closes this menu. Press <kbd>Tab</kbd> at the top of any screen to reveal the “Skip to main content” link.</li>
+                <li><strong>Listening:</strong> this prototype has no read-aloud feature. Use a tool you already have, such as Read Aloud in Microsoft Edge (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>U</kbd>), Narrator on Windows, VoiceOver or Speak Selection on a Mac or iPhone, or TalkBack on Android.</li>
+              </ul>
+            </div>
+
+            <!-- Live status: announces each change without moving focus. -->
+            <p class="status-msg a11y__status" role="status" data-a11y-status></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <noscript>
+    <p class="wrap noscript-note">JavaScript is turned off, so all three prototype screens are shown on one long page and interactive features will not work.</p>
+  </noscript>
+
+  <main id="main" tabindex="-1">
+
+    <!-- =========================================================
+         SCREEN 1 — LEARNING PACKAGE OVERVIEW
+         ========================================================= -->
+    <section class="screen" id="screen-overview" data-screen="overview" data-title="Overview" aria-labelledby="overview-title">
+
+      <div class="hero">
+        <div class="wrap">
+          <p class="eyebrow">Staff and volunteer learning · About 3 hours</p>
+          <!-- tabindex="-1" lets script.js move focus here after navigation. -->
+          <h1 id="overview-title" tabindex="-1">Accessible Community Communication</h1>
+          <p class="hero__subtitle">Creating clearer, more inclusive information for our community</p>
+          <div class="hero__intro measure">
+            <p>Welcome to this short learning package for staff and volunteers at Redland Community Centre.</p>
+            <p>Every day, community members rely on our notices, forms and newsletters to find out about programs, activities and services. How we write and structure that information affects whether people can understand it, find their way around it and take part.</p>
+            <p>In this package you’ll explore common communication barriers and practise making everyday documents easier to read and navigate.</p>
+          </div>
+          <p class="hero__action">
+            <a class="button button--primary button--large" href="#/chapter-5">Start learning</a>
+            <span class="hero__action-note">In this prototype, <strong>Start learning</strong> opens Chapter 5, the sample chapter.</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="wrap">
+
+        <!-- At a glance: description list gives label/value pairs a clear relationship. -->
+        <section class="section" aria-labelledby="glance-title">
+          <h2 id="glance-title" class="visually-hidden">At a glance</h2>
+          <dl class="glance">
+            <div><dt>Time</dt><dd>About 3 hours, including a scheduled 10-minute break</dd></div>
+            <div><dt>Structure</dt><dd>9 short chapters, completed in order at your own pace</dd></div>
+            <div><dt>Assessment</dt><dd>Identify barriers in a community workshop notice, revise it and explain your changes</dd></div>
+            <div><dt>Your progress</dt><dd><span data-progress-text>0 of 9 chapters completed</span></dd></div>
+          </dl>
+        </section>
+
+        <section class="section" aria-labelledby="outcomes-title">
+          <h2 id="outcomes-title"><span class="section-num" aria-hidden="true">01</span> What you’ll be able to do</h2>
+          <p class="measure">By the end of this package, you will be able to:</p>
+          <ol class="outcomes measure">
+            <li>Identify and explain communication barriers in a supplied community notice, considering how those barriers may affect at least three different groups of community members.</li>
+            <li>Revise a supplied community notice to improve plain language and accessible document structure, including appropriate heading styles, and explain the reasons for the changes.</li>
+          </ol>
+        </section>
+
+        <section class="section" aria-labelledby="journey-title">
+          <h2 id="journey-title"><span class="section-num" aria-hidden="true">02</span> Your learning journey</h2>
+
+          <!--
+            The visual journey is decorative (aria-hidden) because the same sequence
+            is given as visible text in the caption and as the full chapter list below.
+            Completed chapters are shown with a fill AND a tick, not colour alone (WCAG 1.4.1).
+          -->
+          <figure class="journey">
+            <div class="journey__track" aria-hidden="true" data-journey></div>
+            <figcaption class="journey__caption">
+              <strong>Sequence:</strong> Chapters 1 to 3 (60 minutes), then a 10-minute break, then Chapters 4 to 9 (110 minutes). Total: about 3 hours.
+            </figcaption>
+          </figure>
+
+          <h3 class="subhead">Chapters</h3>
+          <!-- role="list" restores list semantics that Safari/VoiceOver drops when list-style is none. -->
+          <ol class="chapters" role="list" data-chapter-list>
+            <li class="chapter" data-chapter="1">
+              <p class="chapter__num">Chapter 1</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title">Who are we communicating with?</h4>
+                <p class="chapter__desc">Consider who uses Centre information, including people with disability, older people, people with low literacy and people who speak languages other than English.</p>
+              </div>
+              <p class="chapter__meta"><span>20 min</span><span class="chapter__status" data-chapter-status></span></p>
+            </li>
+            <li class="chapter" data-chapter="2">
+              <p class="chapter__num">Chapter 2</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title">Recognising barriers</h4>
+                <p class="chapter__desc">Identify common barriers in printed and digital information, from dense text to images without descriptions.</p>
+              </div>
+              <p class="chapter__meta"><span>20 min</span><span class="chapter__status" data-chapter-status></span></p>
+            </li>
+            <li class="chapter" data-chapter="3">
+              <p class="chapter__num">Chapter 3</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title">Checking our assumptions</h4>
+                <p class="chapter__desc">Reflect on assumptions about how people read, what they already know and the technology they use.</p>
+              </div>
+              <p class="chapter__meta"><span>20 min</span><span class="chapter__status" data-chapter-status></span></p>
+            </li>
+            <li class="chapter chapter--break">
+              <p class="chapter__num">Break</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title">Scheduled break</h4>
+                <p class="chapter__desc">Step away from the screen, stretch and have a drink before continuing.</p>
+              </div>
+              <p class="chapter__meta"><span>10 min</span></p>
+            </li>
+            <li class="chapter" data-chapter="4">
+              <p class="chapter__num">Chapter 4</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title">Making information clearer</h4>
+                <p class="chapter__desc">Practise plain-language techniques: a clear purpose, short sentences and everyday words.</p>
+              </div>
+              <p class="chapter__meta"><span>20 min</span><span class="chapter__status" data-chapter-status></span></p>
+            </li>
+            <li class="chapter chapter--sample" data-chapter="5">
+              <p class="chapter__num">Chapter 5</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title"><a href="#/chapter-5">Making documents easier to navigate</a></h4>
+                <p class="chapter__desc">Use heading styles so that readers and assistive technology can move through a document. <em>Sample chapter in this prototype.</em></p>
+              </div>
+              <p class="chapter__meta"><span>20 min</span><span class="chapter__status" data-chapter-status></span></p>
+            </li>
+            <li class="chapter" data-chapter="6">
+              <p class="chapter__num">Chapter 6</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title">Applying the changes</h4>
+                <p class="chapter__desc">Revise a sample document using the plain-language and structure techniques from earlier chapters.</p>
+              </div>
+              <p class="chapter__meta"><span>20 min</span><span class="chapter__status" data-chapter-status></span></p>
+            </li>
+            <li class="chapter" data-chapter="7">
+              <p class="chapter__num">Chapter 7</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title">Checking and explaining</h4>
+                <p class="chapter__desc">Use built-in accessibility checkers and explain the changes you made and why they help.</p>
+              </div>
+              <p class="chapter__meta"><span>20 min</span><span class="chapter__status" data-chapter-status></span></p>
+            </li>
+            <li class="chapter" data-chapter="8">
+              <p class="chapter__num">Chapter 8</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title">Reviewing accessibility limitations</h4>
+                <p class="chapter__desc">Understand what automated checkers miss and when to ask people with lived experience for feedback.</p>
+              </div>
+              <p class="chapter__meta"><span>20 min</span><span class="chapter__status" data-chapter-status></span></p>
+            </li>
+            <li class="chapter" data-chapter="9">
+              <p class="chapter__num">Chapter 9</p>
+              <div class="chapter__body">
+                <h4 class="chapter__title">Planning workplace application</h4>
+                <p class="chapter__desc">Plan one change you will make to information you produce at the Centre.</p>
+              </div>
+              <p class="chapter__meta"><span>10 min</span><span class="chapter__status" data-chapter-status></span></p>
+            </li>
+          </ol>
+        </section>
+
+        <section class="section" aria-labelledby="resources-title">
+          <h2 id="resources-title"><span class="section-num" aria-hidden="true">03</span> Before you start</h2>
+          <div class="two-col">
+            <div>
+              <h3 class="subhead">You will need</h3>
+              <ul class="ticks">
+                <li>A computer or laptop. A tablet works for reading, but editing documents is easier with a keyboard.</li>
+                <li>A word processor that can open and save <abbr title="Microsoft Word document">.docx</abbr> files (see the list opposite).</li>
+                <li>Speakers or headphones for the video demonstrations, or use the transcripts.</li>
+                <li>The practice document and the workshop notice, which are supplied in the chapters.</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="subhead">Compatible word processors</h3>
+              <ul class="ticks">
+                <li><strong>Microsoft Word</strong> (Microsoft 365 or Word 2016 and later, Windows or Mac)</li>
+                <li><strong>LibreOffice Writer</strong> (free; save as Word 2007–365 .docx)</li>
+                <li><strong>Google Docs</strong> (free with a Google account; download as .docx)</li>
+              </ul>
+              <p class="note">Instructions are provided for all three. Menu names may differ slightly between versions.</p>
+            </div>
+          </div>
+          <p class="measure">You can stop and come back at any time. Your chapter progress is saved <strong>in this browser only</strong>. See <a href="#about-data">How this prototype stores data</a>.</p>
+        </section>
+
+        <p class="page-action">
+          <a class="button button--primary button--large" href="#/chapter-5">Start learning</a>
+        </p>
+      </div>
+    </section>
+
+
+    <!-- =========================================================
+         SCREEN 2 — CHAPTER 5
+         ========================================================= -->
+    <section class="screen" id="screen-chapter-5" data-screen="chapter-5" data-title="Chapter 5: Making documents easier to navigate" aria-labelledby="ch5-title">
+
+      <!--
+        Compact sticky chapter header. CSS turns stickiness off on short or zoomed
+        viewports so it never covers most of the screen, and script.js sets
+        scroll-padding so focused elements are not hidden underneath it (WCAG 2.4.11).
+        Progress = chapters completed out of 9, never time spent.
+      -->
+      <nav class="wrap breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="#/overview">Overview</a></li>
+          <li><span aria-current="page">Chapter 5: Making documents easier to navigate</span></li>
+        </ol>
+      </nav>
+
+      <header class="chapter-bar" data-sticky-bar>
+        <div class="wrap chapter-bar__inner">
+          <div class="chapter-bar__titles">
+            <p class="chapter-bar__num">Chapter 5 of 9</p>
+            <h1 id="ch5-title" class="chapter-bar__title" tabindex="-1">Making documents easier to navigate</h1>
+          </div>
+          <div class="progress">
+            <!-- Demonstration value: fixed at 40% for this screen, not calculated from saved progress. -->
+            <p class="progress__label">40% complete</p>
+            <!-- Decorative bar; the text above is the accessible equivalent. -->
+            <div class="progress__track" aria-hidden="true"><div class="progress__fill" style="width: 40%"></div></div>
+          </div>
+        </div>
+      </header>
+
+      <div class="wrap chapter-content">
+
+        <section class="section" aria-labelledby="why-title">
+          <h2 id="why-title">Why document headings matter</h2>
+          <div class="measure">
+            <p class="lead">A heading that only <em>looks</em> like a heading isn’t one. To a computer, bold, enlarged text is still an ordinary paragraph.</p>
+            <p>When you apply a built-in <strong>heading style</strong> (such as Heading 1 or Heading 2), your word processor records that the text is a heading and where it sits in the document’s structure. That structure lets people:</p>
+            <ul>
+              <li><strong>jump between sections</strong> using a screen reader’s heading shortcuts, instead of listening to every line;</li>
+              <li><strong>see an outline</strong> in the navigation pane, which helps anyone scan a long document;</li>
+              <li><strong>keep the structure when converting</strong> to PDF or a web page, where headings become bookmarks and navigable headings;</li>
+              <li><strong>generate a table of contents</strong> automatically.</li>
+            </ul>
+            <p>Heading styles also save you time: change the style once and every heading updates.</p>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="compare-title">
+          <h2 id="compare-title">Before and after: bold text versus heading styles</h2>
+          <p class="measure">Both versions of this workshop notice look similar. The difference is what a screen reader or navigation pane can find. Visual appearance alone doesn’t create document structure: bold, enlarged text only becomes a heading when a heading style is applied.</p>
+          <p class="measure note">Extract adapted from an Australian Red Cross EmergencyRedi flyer for a workshop held at Redland Community Centre on Thursday 4 December 2025. This is a historical example used for training, not an upcoming event. We can’t tell from an image of the original flyer which styles its source file used, so both versions below are recreations for this demonstration.</p>
+
+          <!--
+            The sample documents use styled paragraphs, not real <h*> elements, so the
+            examples don't add fake headings to this page's own outline. The style
+            applied to each line is written out as text, not conveyed by colour.
+          -->
+          <div class="compare">
+            <figure class="compare__item compare__item--before">
+              <figcaption class="compare__caption"><span class="tag tag--before">Before</span> Headings made with bold and font size</figcaption>
+              <div class="doc-sample">
+                <p class="doc-sample__line doc-sample__line--h1">Prepare for the Unexpected: Emergency Planning for Households<span class="style-label">Style: Normal, bold, 20 pt</span></p>
+                <p class="doc-sample__line">Australian Red Cross EmergencyRedi workshops are free to book and attend.</p>
+                <p class="doc-sample__line doc-sample__line--h2">About the workshops<span class="style-label">Style: Normal, bold, 14 pt</span></p>
+                <p class="doc-sample__line">Learn how to develop your own Emergency RediPlan and understand risks in your community.</p>
+                <p class="doc-sample__line doc-sample__line--h2">Upcoming workshop<span class="style-label">Style: Normal, bold, 14 pt</span></p>
+                <p class="doc-sample__line">Thursday 4 December 2025, 1:30 pm to 3:00 pm, Activities Room, Redland Community Centre.</p>
+              </div>
+              <div class="outline">
+                <p class="outline__title">What the navigation pane shows</p>
+                <p class="outline__empty">No headings found. A screen reader user must listen line by line.</p>
+              </div>
+            </figure>
+
+            <figure class="compare__item compare__item--after">
+              <figcaption class="compare__caption"><span class="tag tag--after">After</span> Headings made with heading styles</figcaption>
+              <div class="doc-sample">
+                <p class="doc-sample__line doc-sample__line--h1">Prepare for the Unexpected: Emergency Planning for Households<span class="style-label">Style: Heading 1</span></p>
+                <p class="doc-sample__line">Australian Red Cross EmergencyRedi workshops are free to book and attend.</p>
+                <p class="doc-sample__line doc-sample__line--h2">About the workshops<span class="style-label">Style: Heading 2</span></p>
+                <p class="doc-sample__line">Learn how to develop your own Emergency RediPlan and understand risks in your community.</p>
+                <p class="doc-sample__line doc-sample__line--h2">Upcoming workshop<span class="style-label">Style: Heading 2</span></p>
+                <p class="doc-sample__line">Thursday 4 December 2025, 1:30 pm to 3:00 pm, Activities Room, Redland Community Centre.</p>
+              </div>
+              <div class="outline">
+                <p class="outline__title">What the navigation pane shows</p>
+                <ul class="outline__tree">
+                  <li>Prepare for the Unexpected: Emergency Planning for Households
+                    <ul>
+                      <li>About the workshops</li>
+                      <li>Upcoming workshop</li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </figure>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="video-title">
+          <h2 id="video-title">Video: Applying heading styles to a community notice</h2>
+          <!--
+            Honest placeholder: no fake play button, progress bar or caption toggle,
+            because those would suggest working media and captions that don't exist.
+          -->
+          <div class="video-placeholder" role="note" aria-labelledby="video-ph-label">
+            <p class="video-placeholder__label" id="video-ph-label">Prototype placeholder</p>
+            <p>The demonstration video has not been produced yet. When it is, it will show a facilitator applying Heading 1 and Heading 2 styles to the notice above and checking the result in the navigation pane.</p>
+            <p>Planned length: about 4 minutes. The final video will include closed captions and a transcript. <strong>Captions are not available in this prototype.</strong></p>
+          </div>
+
+          <!-- Supplementary content lives in accordions; the main teaching stays visible. -->
+          <div class="accordion-group">
+            <div class="accordion">
+              <h3 class="accordion__heading">
+                <button type="button" class="accordion__trigger" data-accordion-trigger aria-controls="panel-transcript" id="trigger-transcript">
+                  <span>Transcript (draft script for the planned video)</span>
+                </button>
+              </h3>
+              <div class="accordion__panel" id="panel-transcript">
+                <div class="transcript measure">
+                  <p><strong>Narrator:</strong> In this demonstration, we’ll turn a community notice with bold “headings” into a properly structured document.</p>
+                  <p>[On screen: the EmergencyRedi workshop notice, “Prepare for the Unexpected: Emergency Planning for Households”, in Microsoft Word. The Navigation Pane is open on the left and is empty.]</p>
+                  <p><strong>Narrator:</strong> The title and section labels look like headings, but the Navigation Pane is empty. That tells us Word doesn’t recognise any headings.</p>
+                  <p>[The narrator selects the title text.]</p>
+                  <p><strong>Narrator:</strong> I’ll select the title, go to the Home tab and choose Heading 1 from the Styles gallery. The title now appears in the Navigation Pane.</p>
+                  <p>[The narrator selects “About the workshops”, then “Upcoming workshop”, applying Heading 2 to each. Both appear indented under the title in the Navigation Pane.]</p>
+                  <p><strong>Narrator:</strong> Section headings get Heading 2, so they sit under the title. Don’t skip levels: go from Heading 1 to Heading 2, not straight to Heading 3.</p>
+                  <p><strong>Narrator:</strong> If you don’t like how the heading looks, change the style rather than the individual heading, so every heading stays consistent.</p>
+                  <p>[End of demonstration.]</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="howto-title">
+          <h2 id="howto-title">Step-by-step instructions</h2>
+          <p class="measure">Open the instructions for the word processor you use. You can open more than one at a time.</p>
+
+          <div class="accordion-group">
+            <div class="accordion">
+              <h3 class="accordion__heading">
+                <button type="button" class="accordion__trigger" data-accordion-trigger aria-controls="panel-word" id="trigger-word">
+                  <span>Microsoft Word</span>
+                </button>
+              </h3>
+              <div class="accordion__panel" id="panel-word">
+                <h4>Apply a heading style</h4>
+                <ol class="steps">
+                  <li>Select the text you want to make a heading.</li>
+                  <li>On the <strong>Home</strong> tab, in the <strong>Styles</strong> group, choose <strong>Heading 1</strong> for the document title or <strong>Heading 2</strong> for a main section.</li>
+                  <li>Keyboard shortcut (Windows): <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>1</kbd> for Heading 1, <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>2</kbd> for Heading 2.</li>
+                </ol>
+                <h4>Check the structure</h4>
+                <ol class="steps">
+                  <li>On the <strong>View</strong> tab, select <strong>Navigation Pane</strong>.</li>
+                  <li>Choose <strong>Headings</strong>. Every heading should be listed in order, with sub-sections indented.</li>
+                </ol>
+                <h4>Change how headings look</h4>
+                <ol class="steps">
+                  <li>Right-click the heading style in the Styles gallery and choose <strong>Modify</strong>.</li>
+                  <li>Change the font, size or colour, then select <strong>OK</strong>. All headings using that style update.</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="accordion">
+              <h3 class="accordion__heading">
+                <button type="button" class="accordion__trigger" data-accordion-trigger aria-controls="panel-libre" id="trigger-libre">
+                  <span>LibreOffice Writer</span>
+                </button>
+              </h3>
+              <div class="accordion__panel" id="panel-libre">
+                <h4>Apply a heading style</h4>
+                <ol class="steps">
+                  <li>Select the text you want to make a heading.</li>
+                  <li>Open the <strong>Styles</strong> menu and choose <strong>Heading 1</strong> or <strong>Heading 2</strong>. You can also use the <strong>Paragraph Style</strong> box on the Formatting toolbar.</li>
+                  <li>Keyboard shortcut: <kbd>Ctrl</kbd> + <kbd>1</kbd> for Heading 1, <kbd>Ctrl</kbd> + <kbd>2</kbd> for Heading 2 (<kbd>Cmd</kbd> on a Mac).</li>
+                </ol>
+                <h4>Check the structure</h4>
+                <ol class="steps">
+                  <li>Open the <strong>Navigator</strong> by pressing <kbd>F5</kbd>, or choose <strong>View</strong> &gt; <strong>Navigator</strong>.</li>
+                  <li>Expand <strong>Headings</strong> to see the document outline.</li>
+                </ol>
+                <h4>Save as .docx</h4>
+                <ol class="steps">
+                  <li>Choose <strong>File</strong> &gt; <strong>Save As</strong>.</li>
+                  <li>Set the file type to <strong>Word 2007–365 (.docx)</strong>, then select <strong>Save</strong> and <strong>Use Word 2007–365!</strong> if asked.</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="accordion">
+              <h3 class="accordion__heading">
+                <button type="button" class="accordion__trigger" data-accordion-trigger aria-controls="panel-gdocs" id="trigger-gdocs">
+                  <span>Google Docs</span>
+                </button>
+              </h3>
+              <div class="accordion__panel" id="panel-gdocs">
+                <h4>Apply a heading style</h4>
+                <ol class="steps">
+                  <li>Select the text you want to make a heading.</li>
+                  <li>In the toolbar, open the style list (it usually says <strong>Normal text</strong>) and choose <strong>Heading 1</strong> or <strong>Heading 2</strong>.</li>
+                  <li>Keyboard shortcut: <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>1</kbd> or <kbd>2</kbd> (<kbd>Cmd</kbd> + <kbd>Option</kbd> on a Mac).</li>
+                </ol>
+                <h4>Check the structure</h4>
+                <ol class="steps">
+                  <li>Choose <strong>View</strong> &gt; <strong>Show outline</strong>. Headings appear in the outline panel on the left.</li>
+                </ol>
+                <h4>Download as .docx</h4>
+                <ol class="steps">
+                  <li>Choose <strong>File</strong> &gt; <strong>Download</strong> &gt; <strong>Microsoft Word (.docx)</strong>.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="practice-title">
+          <h2 id="practice-title">Guided practice: structure a short notice</h2>
+          <div class="practice">
+            <p class="measure">Take about 10 minutes. Use the <strong>EmergencyRedi workshop</strong> extract above, or a short notice you have written for the Centre.</p>
+            <ol class="steps steps--numbered measure">
+              <li>Type or paste the notice into your word processor.</li>
+              <li>Apply <strong>Heading 1</strong> to the title.</li>
+              <li>Apply <strong>Heading 2</strong> to “About the workshops” and “Upcoming workshop”.</li>
+              <li>Open the navigation pane, Navigator or outline and check that the headings appear in the right order.</li>
+              <li>Reword any heading that doesn’t describe its section clearly.</li>
+            </ol>
+
+            <!-- A fieldset/legend groups the self-check so its purpose is announced with each checkbox. -->
+            <fieldset class="checklist">
+              <legend>Self-check: tick each one you’ve done</legend>
+              <p class="note" id="selfcheck-note">This is for your own reflection. It isn’t saved or marked.</p>
+              <div class="check"><input type="checkbox" id="sc-1" aria-describedby="selfcheck-note"><label for="sc-1">The title uses the Heading 1 style</label></div>
+              <div class="check"><input type="checkbox" id="sc-2"><label for="sc-2">Section headings use Heading 2, with no skipped levels</label></div>
+              <div class="check"><input type="checkbox" id="sc-3"><label for="sc-3">All headings appear in the navigation pane in the right order</label></div>
+              <div class="check"><input type="checkbox" id="sc-4"><label for="sc-4">Each heading tells the reader what the section is about</label></div>
+            </fieldset>
+          </div>
+        </section>
+
+        <section class="section section--complete" aria-labelledby="complete-title">
+          <h2 id="complete-title">Finish this chapter</h2>
+          <p class="measure">When you’ve worked through the content and practice, mark the chapter as complete. You can undo this.</p>
+          <p>
+            <button type="button" class="button button--primary" data-complete-button data-chapter-id="5">Mark chapter complete</button>
+          </p>
+          <!-- Live status: announces the result without moving focus. -->
+          <p class="status-msg" role="status" data-complete-status></p>
+        </section>
+
+        <!-- Previous/next chapters are not built; buttons say so rather than silently failing. -->
+        <nav class="chapter-nav" aria-label="Chapter">
+          <button type="button" class="chapter-nav__link chapter-nav__link--prev" data-missing-chapter="4">
+            <span class="chapter-nav__dir">Previous chapter</span>
+            <span class="chapter-nav__name">4. Making information clearer</span>
+          </button>
+          <button type="button" class="chapter-nav__link chapter-nav__link--next" data-missing-chapter="6">
+            <span class="chapter-nav__dir">Next chapter</span>
+            <span class="chapter-nav__name">6. Applying the changes</span>
+          </button>
+        </nav>
+        <p class="status-msg" role="status" data-chapter-nav-status></p>
+      </div>
+    </section>
+
+
+    <!-- =========================================================
+         SCREEN 3 — ASSESSMENT ACTIVITY
+         ========================================================= -->
+    <section class="screen" id="screen-assessment" data-screen="assessment" data-title="Assessment: Revise a community workshop notice" aria-labelledby="assess-title">
+      <div class="wrap">
+        <nav class="breadcrumb breadcrumb--inner" aria-label="Breadcrumb">
+          <ol>
+            <li><a href="#/overview">Overview</a></li>
+            <li><span aria-current="page">Assessment</span></li>
+          </ol>
+        </nav>
+
+        <!-- Demonstration value: fixed at 49% for this screen, not calculated from saved progress. -->
+        <div class="progress-row">
+          <p class="progress-row__name">Assessment</p>
+          <p class="progress-row__value">49% complete</p>
+          <div class="progress__track" aria-hidden="true"><div class="progress__fill" style="width: 49%"></div></div>
+        </div>
+
+        <div class="page-intro">
+          <p class="eyebrow">Assessment activity</p>
+          <h1 id="assess-title" tabindex="-1">Revise a community workshop notice</h1>
+          <div class="measure">
+            <p class="lead">Show what you’ve learnt by identifying communication barriers in a workshop notice, revising it, and explaining your changes.</p>
+            <p>You will:</p>
+            <ul>
+              <li>identify barriers in the notice and explain how they could affect at least three different groups of community members</li>
+              <li>revise the notice using plain language and heading styles</li>
+              <li>explain at least two of your changes and how they improve accessibility.</li>
+            </ul>
+            <p>Your revised notice will be assessed in two areas:</p>
+          </div>
+          <dl class="domains">
+            <div>
+              <dt><span class="domain-num" aria-hidden="true">1</span> Plain language</dt>
+              <dd>Clear purpose, everyday words, short sentences and consistent dates and times.</dd>
+            </div>
+            <div>
+              <dt><span class="domain-num" aria-hidden="true">2</span> Accessible document structure</dt>
+              <dd>Heading styles, built-in lists, descriptive headings and a completed accessibility check.</dd>
+            </div>
+          </dl>
+        </div>
+
+        <ol class="task-steps" role="list">
+          <li class="task-step">
+            <h2 class="task-step__title"><span class="task-step__num" aria-hidden="true">1</span> Get the notice</h2>
+            <div class="measure">
+              <p>The full notice text is shown below. Select and copy it into your word processor. You don’t need to retype anything or copy text from an image.</p>
+              <p>
+                <button type="button" class="button button--secondary" data-mock-download>Download workshop notice (.docx)</button>
+              </p>
+              <p class="status-msg" role="status" data-download-status></p>
+            </div>
+
+            <!-- Source and status of the notice are stated in visible text before the notice itself. -->
+            <div class="mock-notice" role="note">
+              <p><strong>Training adaptation of a historical flyer.</strong> This notice is adapted from an Australian Red Cross EmergencyRedi flyer for a workshop held at Redland Community Centre on Thursday 4 December 2025. It is not an upcoming event. The event details are unchanged from the original flyer. The wording and layout were deliberately changed to add accessibility barriers for this activity.</p>
+            </div>
+
+            <figure class="notice-extract">
+              <figcaption>Workshop notice: training adaptation</figcaption>
+              <!-- Deliberately poor structure: "headings" are bold paragraphs, not real headings. -->
+              <div class="notice-extract__doc">
+                <p><strong>PREPARE FOR THE UNEXPECTED – EMERGENCY PLANNING FOR HOUSEHOLDS!!!</strong></p>
+                <p>Australian Red Cross EmergencyRedi workshops, which are FREE to book and attend, are designed to equip individuals and households with essential emergency preparedness capabilities, fostering resilience and confidence in the face of disasters, and by means of interactive facilitation participants will be supported to develop their own Emergency RediPlan, attain an understanding of risks within their communities and acquire practical tools to help themselves and those they care about to stay safe.</p>
+                <p><strong>Upcoming Workshop</strong></p>
+                <p>The workshop will be held on Thursday 4th December 2025 from 1:30pm – 3:00pm in the Activities Room – Redland Community Centre – 29 Loraine Street, Capalaba QLD 4157 and RSVPs can be made by visiting, emailing info@redlandcommunitycentre.org or calling reception on 3245 2117, whereas bookings and enquiries regarding FREE workshops are to be directed to QldEmergencyRedi@RedCross.org.au.</p>
+                <p>For more information click here: www.redcross.org.au/emergencyredi</p>
+              </div>
+            </figure>
+
+            <div class="accordion-group">
+              <div class="accordion">
+                <h3 class="accordion__heading">
+                  <button type="button" class="accordion__trigger" data-accordion-trigger aria-controls="panel-adaptation" id="trigger-adaptation">
+                    <span>How this adaptation differs from the original flyer (read after the task)</span>
+                  </button>
+                </h3>
+                <div class="accordion__panel" id="panel-adaptation">
+                  <h4>Kept from the original flyer</h4>
+                  <ul>
+                    <li>The title, and the Australian Red Cross EmergencyRedi workshop name</li>
+                    <li>Date, time, venue and address, and that the workshop is free</li>
+                    <li>RSVP details: visit, email or call reception on 3245 2117, and the email addresses</li>
+                    <li>The website address for more information</li>
+                  </ul>
+                  <h4>Changed for this activity</h4>
+                  <ul>
+                    <li>The title is in capital letters with exclamation marks.</li>
+                    <li>The workshop description is one long sentence with more formal words (for example, “capabilities”, “by means of interactive facilitation”).</li>
+                    <li>The “About the workshops” label was removed, and the “Upcoming Workshop” label is bold Normal text rather than a heading.</li>
+                    <li>All event and booking details are combined into one paragraph instead of separate lines.</li>
+                    <li>The website line uses the vague phrase “click here”.</li>
+                    <li>The photo and logos are left out.</li>
+                  </ul>
+                  <p class="note">This list describes changes made for training. It is not an accessibility review of the original flyer, and it doesn’t list every barrier you might find.</p>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <li class="task-step">
+            <h2 class="task-step__title"><span class="task-step__num" aria-hidden="true">2</span> Identify barriers and revise the notice</h2>
+            <div class="measure">
+              <p>Read the notice and note barriers that could affect at least three different groups of community members. For example, think about people who use screen readers, people with low literacy, people who speak English as an additional language and older people. You’ll record these in Step 3.</p>
+              <p>Then open the notice in Microsoft Word, LibreOffice Writer or Google Docs. Improve the plain language and the document structure, using what you practised in Chapters 4 and 5. Keep all the event details accurate.</p>
+              <p>Save your revised notice as a <strong>.docx</strong> file. In Google Docs, choose <strong>File</strong> &gt; <strong>Download</strong> &gt; <strong>Microsoft Word (.docx)</strong>. In LibreOffice Writer, choose <strong>File</strong> &gt; <strong>Save As</strong> and select <strong>Word 2007–365 (.docx)</strong>.</p>
+            </div>
+          </li>
+
+          <li class="task-step">
+            <h2 class="task-step__title"><span class="task-step__num" aria-hidden="true">3</span> Record your barriers, checklist and explanations, then submit</h2>
+
+            <!-- Mock submission notice placed before the form so it's read first. -->
+            <div class="mock-notice" role="note">
+              <p><strong>Mock submission.</strong> Nothing in this form is uploaded or sent anywhere. Your file stays on your device and your answers are not saved. The form only checks that each part is filled in.</p>
+            </div>
+
+            <!--
+              novalidate: script.js does its own validation so errors use a consistent,
+              accessible pattern (error summary + inline messages + aria-invalid)
+              rather than browser tooltips, which vary across browsers and zoom levels.
+            -->
+            <form class="assess-form" data-assess-form novalidate>
+
+              <!-- Error summary: hidden until submit fails; receives focus so errors are announced (WCAG 3.3.1). -->
+              <div class="error-summary" data-error-summary tabindex="-1" hidden role="group" aria-labelledby="error-summary-title">
+                <h3 id="error-summary-title">There is a problem</h3>
+                <ul data-error-list></ul>
+              </div>
+
+              <fieldset class="explain">
+                <legend>Communication barriers for three community groups</legend>
+                <p class="note" id="barriers-hint">For each group, name the group, the barrier in the notice, and how it could affect them.</p>
+                <div class="field">
+                  <label for="barrier-1">Community group 1</label>
+                  <p class="field-error" id="barrier-1-error" data-error-for="barrier-1" hidden></p>
+                  <textarea id="barrier-1" rows="3" aria-describedby="barriers-hint barrier-1-error"></textarea>
+                </div>
+                <div class="field">
+                  <label for="barrier-2">Community group 2</label>
+                  <p class="field-error" id="barrier-2-error" data-error-for="barrier-2" hidden></p>
+                  <textarea id="barrier-2" rows="3" aria-describedby="barriers-hint barrier-2-error"></textarea>
+                </div>
+                <div class="field">
+                  <label for="barrier-3">Community group 3</label>
+                  <p class="field-error" id="barrier-3-error" data-error-for="barrier-3" hidden></p>
+                  <textarea id="barrier-3" rows="3" aria-describedby="barriers-hint barrier-3-error"></textarea>
+                </div>
+              </fieldset>
+
+              <fieldset class="checklist" id="checklist-plain" aria-describedby="checklist-plain-error">
+                <legend>Checklist, domain 1: Plain language</legend>
+                <p class="field-error" id="checklist-plain-error" data-error-for="checklist-plain" hidden></p>
+                <div class="check"><input type="checkbox" id="pl-1" name="plain"><label for="pl-1">The purpose of the notice is clear in the first sentence or two</label></div>
+                <div class="check"><input type="checkbox" id="pl-2" name="plain"><label for="pl-2">I replaced jargon and formal words with everyday words</label></div>
+                <div class="check"><input type="checkbox" id="pl-3" name="plain"><label for="pl-3">Sentences are short, with mostly one idea each</label></div>
+                <div class="check"><input type="checkbox" id="pl-4" name="plain"><label for="pl-4">Dates and times are written in full and consistently (for example, Thursday 4 December 2025, 1:30 pm to 3:00 pm)</label></div>
+              </fieldset>
+
+              <fieldset class="checklist" id="checklist-structure" aria-describedby="checklist-structure-error">
+                <legend>Checklist, domain 2: Accessible document structure</legend>
+                <p class="field-error" id="checklist-structure-error" data-error-for="checklist-structure" hidden></p>
+                <div class="check"><input type="checkbox" id="st-1" name="structure"><label for="st-1">The title uses Heading 1 and section headings use Heading 2</label></div>
+                <div class="check"><input type="checkbox" id="st-2" name="structure"><label for="st-2">Lists use the built-in bulleted or numbered list feature</label></div>
+                <div class="check"><input type="checkbox" id="st-3" name="structure"><label for="st-3">Link text describes where the link goes (no “click here”)</label></div>
+                <div class="check"><input type="checkbox" id="st-4" name="structure"><label for="st-4">I ran the built-in accessibility checker and fixed or noted any issues</label></div>
+              </fieldset>
+
+              <fieldset class="explain">
+                <legend>Change and reason 1: Plain language</legend>
+                <p class="note">Describe one plain-language change and why it helps readers. One to three sentences is enough.</p>
+                <div class="field">
+                  <label for="change-1">What I changed</label>
+                  <p class="field-error" id="change-1-error" data-error-for="change-1" hidden></p>
+                  <textarea id="change-1" rows="3" aria-describedby="change-1-error"></textarea>
+                </div>
+                <div class="field">
+                  <label for="reason-1">Why this helps readers</label>
+                  <p class="field-error" id="reason-1-error" data-error-for="reason-1" hidden></p>
+                  <textarea id="reason-1" rows="3" aria-describedby="reason-1-error"></textarea>
+                </div>
+              </fieldset>
+
+              <fieldset class="explain">
+                <legend>Change and reason 2: Document structure</legend>
+                <p class="note">Describe one structural change and why it helps readers.</p>
+                <div class="field">
+                  <label for="change-2">What I changed</label>
+                  <p class="field-error" id="change-2-error" data-error-for="change-2" hidden></p>
+                  <textarea id="change-2" rows="3" aria-describedby="change-2-error"></textarea>
+                </div>
+                <div class="field">
+                  <label for="reason-2">Why this helps readers</label>
+                  <p class="field-error" id="reason-2-error" data-error-for="reason-2" hidden></p>
+                  <textarea id="reason-2" rows="3" aria-describedby="reason-2-error"></textarea>
+                </div>
+              </fieldset>
+
+              <div class="field field--file">
+                <label for="revised-file">Your revised notice <span class="label-hint">(.docx file only)</span></label>
+                <p class="note" id="file-hint">Choosing a file does not upload it. The prototype only reads the file name and type.</p>
+                <p class="field-error" id="revised-file-error" data-error-for="revised-file" hidden></p>
+                <input type="file" id="revised-file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-describedby="file-hint revised-file-error">
+              </div>
+
+              <p>
+                <button type="submit" class="button button--primary">Check and submit (mock)</button>
+              </p>
+            </form>
+
+            <!-- Shown after a valid mock submission. Deliberately reports no grade or result. -->
+            <div class="confirmation" data-confirmation tabindex="-1" hidden role="group" aria-labelledby="confirm-title">
+              <h3 id="confirm-title">Mock submission complete: nothing was sent</h3>
+              <p>Every part of the form is filled in. In the full learning package, this is where your revised notice would be sent to a facilitator for review.</p>
+              <ul data-confirm-summary></ul>
+              <p><strong>No result or feedback has been generated.</strong> This prototype does not assess your work.</p>
+              <p><button type="button" class="button button--secondary" data-reset-form>Start the form again</button></p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SCREEN 4: RESOURCES
+         Collects materials and guidance that already appear elsewhere in the
+         prototype. Nothing here is new learning content and there are no
+         external links.
+         ========================================================= -->
+    <section class="screen" id="screen-resources" data-screen="resources" data-title="Resources" aria-labelledby="resources-page-title">
+
+      <nav class="wrap breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="#/overview">Overview</a></li>
+          <li><span aria-current="page">Resources</span></li>
+        </ol>
+      </nav>
+
+      <header class="chapter-bar chapter-bar--page">
+        <div class="wrap chapter-bar__inner">
+          <h1 id="resources-page-title" class="chapter-bar__title" tabindex="-1">Resources</h1>
+        </div>
+      </header>
+
+      <div class="wrap chapter-content">
+
+        <section class="section" aria-labelledby="res-find-title">
+          <h2 id="res-find-title">Where to find things</h2>
+          <p class="measure">Materials from this learning package are collected here. Each link opens a screen in this prototype.</p>
+          <ul class="measure">
+            <li><a href="#/overview">Overview</a>: learning outcomes, the chapter list and what you will need.</li>
+            <li><a href="#/chapter-5">Chapter 5: Making documents easier to navigate</a>: the sample chapter, with the before and after example, the transcript and guided practice.</li>
+            <li><a href="#/assessment">Assessment</a>: the workshop notice, the task steps and the form.</li>
+          </ul>
+        </section>
+
+        <section class="section" aria-labelledby="res-before-title">
+                  <h2 id="res-before-title">Before you start</h2>
+                  <div class="two-col">
+                    <div>
+                      <h3 class="subhead">You will need</h3>
+                      <ul class="ticks">
+                        <li>A computer or laptop. A tablet works for reading, but editing documents is easier with a keyboard.</li>
+                        <li>A word processor that can open and save <abbr title="Microsoft Word document">.docx</abbr> files (see the list opposite).</li>
+                        <li>Speakers or headphones for the video demonstrations, or use the transcripts.</li>
+                        <li>The practice document and the workshop notice, which are supplied in the chapters.</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h3 class="subhead">Compatible word processors</h3>
+                      <ul class="ticks">
+                        <li><strong>Microsoft Word</strong> (Microsoft 365 or Word 2016 and later, Windows or Mac)</li>
+                        <li><strong>LibreOffice Writer</strong> (free; save as Word 2007–365 .docx)</li>
+                        <li><strong>Google Docs</strong> (free with a Google account; download as .docx)</li>
+                      </ul>
+                      <p class="note">Instructions are provided for all three. Menu names may differ slightly between versions.</p>
+                    </div>
+                  </div>
+                </section>
+
+        <section class="section" aria-labelledby="res-howto-title">
+                  <h2 id="res-howto-title">Step-by-step instructions</h2>
+                  <p class="measure">Open the instructions for the word processor you use. You can open more than one at a time.</p>
+        
+                  <div class="accordion-group">
+                    <div class="accordion">
+                      <h3 class="accordion__heading">
+                        <button type="button" class="accordion__trigger" data-accordion-trigger aria-controls="res-panel-word" id="res-trigger-word">
+                          <span>Microsoft Word</span>
+                        </button>
+                      </h3>
+                      <div class="accordion__panel" id="res-panel-word">
+                        <h4>Apply a heading style</h4>
+                        <ol class="steps">
+                          <li>Select the text you want to make a heading.</li>
+                          <li>On the <strong>Home</strong> tab, in the <strong>Styles</strong> group, choose <strong>Heading 1</strong> for the document title or <strong>Heading 2</strong> for a main section.</li>
+                          <li>Keyboard shortcut (Windows): <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>1</kbd> for Heading 1, <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>2</kbd> for Heading 2.</li>
+                        </ol>
+                        <h4>Check the structure</h4>
+                        <ol class="steps">
+                          <li>On the <strong>View</strong> tab, select <strong>Navigation Pane</strong>.</li>
+                          <li>Choose <strong>Headings</strong>. Every heading should be listed in order, with sub-sections indented.</li>
+                        </ol>
+                        <h4>Change how headings look</h4>
+                        <ol class="steps">
+                          <li>Right-click the heading style in the Styles gallery and choose <strong>Modify</strong>.</li>
+                          <li>Change the font, size or colour, then select <strong>OK</strong>. All headings using that style update.</li>
+                        </ol>
+                      </div>
+                    </div>
+        
+                    <div class="accordion">
+                      <h3 class="accordion__heading">
+                        <button type="button" class="accordion__trigger" data-accordion-trigger aria-controls="res-panel-libre" id="res-trigger-libre">
+                          <span>LibreOffice Writer</span>
+                        </button>
+                      </h3>
+                      <div class="accordion__panel" id="res-panel-libre">
+                        <h4>Apply a heading style</h4>
+                        <ol class="steps">
+                          <li>Select the text you want to make a heading.</li>
+                          <li>Open the <strong>Styles</strong> menu and choose <strong>Heading 1</strong> or <strong>Heading 2</strong>. You can also use the <strong>Paragraph Style</strong> box on the Formatting toolbar.</li>
+                          <li>Keyboard shortcut: <kbd>Ctrl</kbd> + <kbd>1</kbd> for Heading 1, <kbd>Ctrl</kbd> + <kbd>2</kbd> for Heading 2 (<kbd>Cmd</kbd> on a Mac).</li>
+                        </ol>
+                        <h4>Check the structure</h4>
+                        <ol class="steps">
+                          <li>Open the <strong>Navigator</strong> by pressing <kbd>F5</kbd>, or choose <strong>View</strong> &gt; <strong>Navigator</strong>.</li>
+                          <li>Expand <strong>Headings</strong> to see the document outline.</li>
+                        </ol>
+                        <h4>Save as .docx</h4>
+                        <ol class="steps">
+                          <li>Choose <strong>File</strong> &gt; <strong>Save As</strong>.</li>
+                          <li>Set the file type to <strong>Word 2007–365 (.docx)</strong>, then select <strong>Save</strong> and <strong>Use Word 2007–365!</strong> if asked.</li>
+                        </ol>
+                      </div>
+                    </div>
+        
+                    <div class="accordion">
+                      <h3 class="accordion__heading">
+                        <button type="button" class="accordion__trigger" data-accordion-trigger aria-controls="res-panel-gdocs" id="res-trigger-gdocs">
+                          <span>Google Docs</span>
+                        </button>
+                      </h3>
+                      <div class="accordion__panel" id="res-panel-gdocs">
+                        <h4>Apply a heading style</h4>
+                        <ol class="steps">
+                          <li>Select the text you want to make a heading.</li>
+                          <li>In the toolbar, open the style list (it usually says <strong>Normal text</strong>) and choose <strong>Heading 1</strong> or <strong>Heading 2</strong>.</li>
+                          <li>Keyboard shortcut: <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>1</kbd> or <kbd>2</kbd> (<kbd>Cmd</kbd> + <kbd>Option</kbd> on a Mac).</li>
+                        </ol>
+                        <h4>Check the structure</h4>
+                        <ol class="steps">
+                          <li>Choose <strong>View</strong> &gt; <strong>Show outline</strong>. Headings appear in the outline panel on the left.</li>
+                        </ol>
+                        <h4>Download as .docx</h4>
+                        <ol class="steps">
+                          <li>Choose <strong>File</strong> &gt; <strong>Download</strong> &gt; <strong>Microsoft Word (.docx)</strong>.</li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+        <section class="section" aria-labelledby="res-assess-title">
+          <h2 id="res-assess-title">Assessment areas</h2>
+          <p class="measure">Your revised notice will be assessed in two areas:</p>
+          <dl class="domains">
+            <div>
+              <dt><span class="domain-num" aria-hidden="true">1</span> Plain language</dt>
+              <dd>Clear purpose, everyday words, short sentences and consistent dates and times.</dd>
+            </div>
+            <div>
+              <dt><span class="domain-num" aria-hidden="true">2</span> Accessible document structure</dt>
+              <dd>Heading styles, built-in lists, descriptive headings and a completed accessibility check.</dd>
+            </div>
+          </dl>
+          <p class="page-action page-action--inline"><a class="button button--secondary" href="#/assessment">Go to the Assessment</a></p>
+        </section>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="site-footer__legal">Prototype for design review. Not an official Redland Community Centre or Australian Red Cross publication. The EmergencyRedi workshop notice is a training adaptation of a historical flyer for a workshop held in December 2025; it is not an upcoming event.</p>
+
+      <!-- Reviewer notes are kept, but collapsed so the footer stays small. -->
+      <details class="footer-notes" data-footer-notes>
+        <summary>Prototype notes: data storage and reviewer tools</summary>
+        <section aria-labelledby="about-data" class="footer-block">
+          <h2 id="about-data" tabindex="-1">How this prototype stores data</h2>
+          <ul>
+            <li>The only thing saved is which chapters you’ve marked complete. It is stored in this browser’s <strong>localStorage</strong> on this device.</li>
+            <li>Nothing is sent to a server. There are no accounts, analytics or tracking.</li>
+            <li>Anyone using this browser profile on this computer could see your progress. Progress doesn’t carry across browsers or devices, and clearing browser data removes it.</li>
+            <li>Assessment answers and files are never saved.</li>
+            <li>Chapters 1 to 4 are shown as completed on the Chapter 5 and Assessment screens for demonstration. They are not saved. The 40% and 49% progress values on those screens are fixed demonstration values, not a record of what you have done.</li>
+            <li>Accessibility menu settings (text size, text mode and page mask) are not saved. They reset when you reload the page.</li>
+          </ul>
+          <p class="status-msg" role="status" data-storage-status></p>
+        </section>
+
+        <section aria-labelledby="proto-tools" class="footer-block">
+          <h2 id="proto-tools">Prototype tools for reviewers</h2>
+          <p>These controls are for testing the prototype and would not appear in the real package.</p>
+          <p class="button-row">
+            <button type="button" class="button button--quiet" data-simulate>Simulate Chapters 1 to 4 as completed</button>
+            <button type="button" class="button button--quiet" data-reset-all>Reset all prototype data</button>
+          </p>
+          <p class="status-msg" role="status" data-tools-status></p>
+        </section>
+      </details>
+    </div>
+  </footer>
+</body>
+</html>
