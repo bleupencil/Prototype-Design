@@ -713,7 +713,6 @@ main:focus { outline: none; }
    labelled placeholder with no fake player controls. */
 .video-placeholder {
   max-width: 48rem;
-  aspect-ratio: 16 / 9;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -724,9 +723,15 @@ main:focus { outline: none; }
   border-radius: var(--radius-lg);
   background: var(--page);
 }
-/* aspect-ratio is a minimum, so text is never cut off when enlarged. */
-@supports (aspect-ratio: 1) { .video-placeholder { height: auto; min-height: 0; } }
-.video-placeholder p { margin: 0 0 0.75rem; max-width: 36rem; }
+/* The 16:9 shape is only applied where the box is wide enough to hold the
+   text. On narrow screens, or with enlarged text, the box simply grows to fit
+   its content, so nothing overflows onto the heading or the transcript bar.
+   Without a min-height override, aspect-ratio acts as a minimum, never a cap. */
+@media (min-width: 48rem) {
+  .video-placeholder { aspect-ratio: 16 / 9; }
+}
+.video-placeholder p { margin: 0 0 0.75rem; max-width: 36rem; overflow-wrap: anywhere; }
+.video-placeholder p:last-child { margin-bottom: 0; }
 .video-placeholder__label {
   align-self: flex-start;
   padding: 0.15rem 0.6rem;
