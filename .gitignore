@@ -1,7 +1,7 @@
 # Exclude university working files
-Prototype Design/Assets/
-Prototype Design/Screenshots/
-Prototype Design/Working/
+Assets/
+Screenshots/
+Working/
 
 # Exclude Illustrator source files
 *.ai
